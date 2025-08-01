@@ -9,24 +9,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <nav class="navbar">
             <div class="nav-container">
-                <div class="logo">
-                    <img src="Public/logo.jpg" alt="B3stia's Cake Logo" class="logo-image">
-                    <div class="logo-text">
-                        <h1>B3stia's</h1>
-                        <span>Pasteleria Artesanal</span>
+                                                <button class="logo-button" onclick="handleLogoClick()">
+                    <div class="logo">
+                        <img src="Public/logo.jpg" alt="B3stia's Cake Logo" class="logo-image">
+                        <div class="logo-text">
+                            <h1>B3stia's</h1>
+                            <span>Pasteleria Artesanal</span>
+                        </div>
                     </div>
-                </div>
+                </button>
                 <ul class="nav-menu">
                     <li><a href="#inicio">Inicio</a></li>
                     <li><a href="#pasteles">Pasteles</a></li>
                     <li><a href="#personalizados">Personalizados</a></li>
-                    <li><a href="#calculadora">Calculadora</a></li>
                     <li><a href="#nosotros">Nosotros</a></li>
                     <li><a href="#contacto">Contacto</a></li>
                 </ul>
@@ -165,45 +168,128 @@
                             <label for="telefono">Teléfono</label>
                             <input type="tel" id="telefono" name="telefono" required>
                         </div>
-                        <div class="form-group">
-                            <label for="sabor">Sabor del pastel</label>
-                            <select id="sabor" name="sabor" required>
-                                <option value="">Selecciona un sabor</option>
-                                <option value="chocolate">Chocolate</option>
-                                <option value="vainilla">Vainilla</option>
-                                <option value="frutas">Frutas del Bosque</option>
-                                <option value="red-velvet">Red Velvet</option>
-                                <option value="limon">Limón</option>
-                                <option value="cafe">Café</option>
-                                <option value="personalizado">Otro (especificar)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="tamaño">Tamaño</label>
-                            <select id="tamaño" name="tamaño" required>
-                                <option value="">Selecciona el tamaño</option>
-                                <option value="pequeño">Pequeño (6-8 personas)</option>
-                                <option value="mediano">Mediano (10-12 personas)</option>
-                                <option value="grande">Grande (15-20 personas)</option>
-                                <option value="extra-grande">Extra Grande (25+ personas)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="decoracion">Tipo de decoración</label>
-                            <select id="decoracion" name="decoracion" required>
-                                <option value="">Selecciona la decoración</option>
-                                <option value="flores">Flores naturales</option>
-                                <option value="fondant">Fondant</option>
-                                <option value="crema">Crema de mantequilla</option>
-                                <option value="frutas">Frutas frescas</option>
-                                <option value="chocolate">Chocolate artístico</option>
-                                <option value="personalizada">Personalizada</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="fecha">Fecha de entrega</label>
-                            <input type="date" id="fecha" name="fecha" required>
-                        </div>
+                                                 <div class="form-group">
+                             <label for="tamaño">Tamaño del Pastel</label>
+                             <select id="tamaño" name="tamaño" required>
+                                 <option value="">Selecciona el tamaño</option>
+                                 <option value="pequeño" data-precio="25">Pequeño (6-8 personas) - $25</option>
+                                 <option value="mediano" data-precio="45">Mediano (10-12 personas) - $45</option>
+                                 <option value="grande" data-precio="65">Grande (15-20 personas) - $65</option>
+                                 <option value="extra-grande" data-precio="85">Extra Grande (25+ personas) - $85</option>
+                             </select>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label>Sabor de la Masa</label>
+                             <div class="checkbox-group">
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="sabores" value="vainilla" data-precio="0">
+                                     <span class="checkmark"></span>
+                                     Vainilla (incluido)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="sabores" value="chocolate" data-precio="5">
+                                     <span class="checkmark"></span>
+                                     Chocolate (+$5)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="sabores" value="red-velvet" data-precio="8">
+                                     <span class="checkmark"></span>
+                                     Red Velvet (+$8)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="sabores" value="limon" data-precio="6">
+                                     <span class="checkmark"></span>
+                                     Limón (+$6)
+                                 </label>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label>Rellenos</label>
+                             <div class="checkbox-group">
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="rellenos" value="crema-vainilla" data-precio="3">
+                                     <span class="checkmark"></span>
+                                     Crema de Vainilla (+$3)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="rellenos" value="chocolate" data-precio="4">
+                                     <span class="checkmark"></span>
+                                     Chocolate (+$4)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="rellenos" value="frutilla" data-precio="5">
+                                     <span class="checkmark"></span>
+                                     Frutilla (+$5)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="rellenos" value="dulce-leche" data-precio="4">
+                                     <span class="checkmark"></span>
+                                     Dulce de Leche (+$4)
+                                 </label>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label>Decoraciones Especiales</label>
+                             <div class="checkbox-group">
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="decoraciones" value="flores-fondant" data-precio="15">
+                                     <span class="checkmark"></span>
+                                     Flores de Fondant (+$15)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="decoraciones" value="figuras-3d" data-precio="20">
+                                     <span class="checkmark"></span>
+                                     Figuras 3D (+$20)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="decoraciones" value="pintura-comestible" data-precio="12">
+                                     <span class="checkmark"></span>
+                                     Pintura Comestible (+$12)
+                                 </label>
+                                 <label class="checkbox-item">
+                                     <input type="checkbox" name="decoraciones" value="glitter-comestible" data-precio="8">
+                                     <span class="checkmark"></span>
+                                     Glitter Comestible (+$8)
+                                 </label>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label for="cantidad">Cantidad</label>
+                             <input type="number" id="cantidad" name="cantidad" min="1" max="10" value="1" required>
+                         </div>
+                         
+                                                  <div class="form-group">
+                             <label for="decoracion-especial">Decoración adicional (opcional)</label>
+                             <textarea id="decoracion-especial" name="decoracion-especial" rows="3" placeholder="Describe cualquier decoración especial o personalizada que desees..."></textarea>
+                         </div>
+                         
+                         <!-- Calculadora de precio en tiempo real -->
+                         <div class="precio-calculadora">
+                             <div class="precio-total">
+                                 <h4>Precio Estimado</h4>
+                                 <div class="precio-valor">
+                                     <span class="moneda">$</span>
+                                     <span id="precio-total-personalizado">0</span>
+                                 </div>
+                                 <p class="precio-nota">* Precio base + ingredientes seleccionados</p>
+                             </div>
+                             
+                             <div class="desglose-precio">
+                                 <h5>Desglose</h5>
+                                 <div id="desglose-lista-personalizado">
+                                     <p class="no-seleccion">Selecciona opciones para ver el desglose</p>
+                                 </div>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label for="fecha">Fecha de entrega</label>
+                             <input type="date" id="fecha" name="fecha" required>
+                         </div>
                         <div class="form-group">
                             <label for="mensaje">Descripción especial</label>
                             <textarea id="mensaje" name="mensaje" rows="4" placeholder="Cuéntanos sobre tu idea especial, colores preferidos, tema de la celebración..."></textarea>
@@ -234,135 +320,7 @@
         </div>
     </section>
 
-    <!-- Calculadora de Precios Section -->
-    <section id="calculadora" class="calculadora">
-        <div class="container">
-            <div class="section-header">
-                <h2>Calculadora de Precios</h2>
-                <p>Estima el costo de tu pastel personalizado</p>
-            </div>
-            <div class="calculadora-content">
-                <div class="calculadora-form">
-                    <div class="form-group">
-                        <label for="tamano">Tamaño del Pastel</label>
-                        <select id="tamano" name="tamano" required>
-                            <option value="">Selecciona el tamaño</option>
-                            <option value="pequeno" data-precio="25">Pequeño (6-8 personas) - $25</option>
-                            <option value="mediano" data-precio="45">Mediano (10-12 personas) - $45</option>
-                            <option value="grande" data-precio="65">Grande (15-20 personas) - $65</option>
-                            <option value="extra-grande" data-precio="85">Extra Grande (25+ personas) - $85</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Sabor de la Masa</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="sabores" value="vainilla" data-precio="0">
-                                <span class="checkmark"></span>
-                                Vainilla (incluido)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="sabores" value="chocolate" data-precio="5">
-                                <span class="checkmark"></span>
-                                Chocolate (+$5)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="sabores" value="red-velvet" data-precio="8">
-                                <span class="checkmark"></span>
-                                Red Velvet (+$8)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="sabores" value="limon" data-precio="6">
-                                <span class="checkmark"></span>
-                                Limón (+$6)
-                            </label>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Rellenos</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="rellenos" value="crema-vainilla" data-precio="3">
-                                <span class="checkmark"></span>
-                                Crema de Vainilla (+$3)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="rellenos" value="chocolate" data-precio="4">
-                                <span class="checkmark"></span>
-                                Chocolate (+$4)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="rellenos" value="frutilla" data-precio="5">
-                                <span class="checkmark"></span>
-                                Frutilla (+$5)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="rellenos" value="dulce-leche" data-precio="4">
-                                <span class="checkmark"></span>
-                                Dulce de Leche (+$4)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Decoraciones Especiales</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="decoraciones" value="flores-fondant" data-precio="15">
-                                <span class="checkmark"></span>
-                                Flores de Fondant (+$15)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="decoraciones" value="figuras-3d" data-precio="20">
-                                <span class="checkmark"></span>
-                                Figuras 3D (+$20)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="decoraciones" value="pintura-comestible" data-precio="12">
-                                <span class="checkmark"></span>
-                                Pintura Comestible (+$12)
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="decoraciones" value="glitter-comestible" data-precio="8">
-                                <span class="checkmark"></span>
-                                Glitter Comestible (+$8)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="cantidad">Cantidad</label>
-                        <input type="number" id="cantidad" name="cantidad" min="1" max="10" value="1" required>
-                    </div>
-                </div>
-                
-                <div class="calculadora-resultado">
-                    <div class="precio-total">
-                        <h3>Precio Estimado</h3>
-                        <div class="precio-valor">
-                            <span class="moneda">$</span>
-                            <span id="precio-total">0</span>
-                        </div>
-                        <p class="precio-nota">* Precio base + ingredientes seleccionados</p>
-                    </div>
-                    
-                    <div class="desglose-precio">
-                        <h4>Desglose</h4>
-                        <div id="desglose-lista">
-                            <p class="no-seleccion">Selecciona opciones para ver el desglose</p>
-                        </div>
-                    </div>
-                    
-                    <div class="calculadora-acciones">
-                        <button id="limpiar-calculadora" class="btn btn-secondary">Limpiar</button>
-                        <a href="#personalizados" class="btn btn-primary">Hacer Pedido</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Nosotros Section -->
                     <div class="info-card">
@@ -525,6 +483,200 @@
             </div>
         </div>
     </footer>
+
+    <!-- Modal de Contraseña -->
+    <div id="passwordModal" class="password-modal">
+        <div class="password-modal-content">
+            <div class="password-header">
+                <h3><i class="fas fa-lock"></i> Acceso Administrador</h3>
+                <button class="close-password-btn" onclick="closePasswordModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="password-body">
+                <p>Ingresa la contraseña para acceder al panel de administrador:</p>
+                <div class="password-input-container">
+                    <input type="password" id="adminPassword" placeholder="Contraseña" class="password-input">
+                    <button class="btn btn-primary" onclick="checkPassword()">
+                        <i class="fas fa-sign-in-alt"></i> Ingresar
+                    </button>
+                </div>
+                <div class="password-error" id="passwordError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Contraseña incorrecta. Intenta de nuevo.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Administrador -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="admin-panel-content">
+                            <div class="admin-header">
+                    <h2><i class="fas fa-crown"></i> Panel de Administrador</h2>
+                                                <div class="admin-header-actions">
+                                <button class="btn-utilidad" onclick="exportarPedidos()" title="Exportar pedidos como PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                                <button class="btn-utilidad" onclick="limpiarPedidosLocalStorage()" title="Limpiar todos los pedidos" style="background: #dc3545;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="close-admin-btn" onclick="closeAdminPanel()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                </div>
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showTab('pedidos')">Pedidos</button>
+                <button class="tab-btn" onclick="showTab('estadisticas')">Estadísticas</button>
+                <button class="tab-btn" onclick="showTab('configuracion')">Configuración</button>
+            </div>
+            <div class="admin-content">
+                <!-- Tab de Pedidos -->
+                <div id="pedidos" class="tab-content active">
+                    <div class="pedidos-header">
+                        <h3>Pedidos Recientes</h3>
+                        <div class="pedidos-filtros">
+                            <select id="filtroEstado">
+                                <option value="todos">Todos los estados</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="en-proceso">En proceso</option>
+                                <option value="completado">Completado</option>
+                                <option value="entregado">Entregado</option>
+                            </select>
+                            <input type="date" id="filtroFecha">
+                        </div>
+                    </div>
+                    <div class="pedidos-lista" id="pedidosLista">
+                        <!-- Los pedidos se cargarán dinámicamente aquí -->
+                        <div class="pedido-item">
+                            <div class="pedido-header">
+                                <span class="pedido-id">#001</span>
+                                <span class="pedido-fecha">15/01/2025</span>
+                                <span class="pedido-estado pendiente">Pendiente</span>
+                            </div>
+                            <div class="pedido-info">
+                                <h4>Pastel de Chocolate Personalizado</h4>
+                                <p><strong>Cliente:</strong> María González</p>
+                                <p><strong>Teléfono:</strong> +1 (555) 123-4567</p>
+                                <p><strong>Fecha de entrega:</strong> 20/01/2025</p>
+                                <p><strong>Precio:</strong> $85.00</p>
+                            </div>
+                            <div class="pedido-acciones">
+                                <button class="btn-accion btn-ver" onclick="verPedido('001')">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                                <button class="btn-accion btn-editar" onclick="editarPedido('001')">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn-accion btn-estado" onclick="cambiarEstado('001')">
+                                    <i class="fas fa-check"></i> Completar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="pedido-item">
+                            <div class="pedido-header">
+                                <span class="pedido-id">#002</span>
+                                <span class="pedido-fecha">14/01/2025</span>
+                                <span class="pedido-estado en-proceso">En proceso</span>
+                            </div>
+                            <div class="pedido-info">
+                                <h4>Pastel de Vainilla con Frutas</h4>
+                                <p><strong>Cliente:</strong> Carlos Rodríguez</p>
+                                <p><strong>Teléfono:</strong> +1 (555) 987-6543</p>
+                                <p><strong>Fecha de entrega:</strong> 18/01/2025</p>
+                                <p><strong>Precio:</strong> $65.00</p>
+                            </div>
+                            <div class="pedido-acciones">
+                                <button class="btn-accion btn-ver" onclick="verPedido('002')">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                                <button class="btn-accion btn-editar" onclick="editarPedido('002')">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn-accion btn-estado" onclick="cambiarEstado('002')">
+                                    <i class="fas fa-truck"></i> Entregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab de Estadísticas -->
+                <div id="estadisticas" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Pedidos</h3>
+                                <p class="stat-number">24</p>
+                                <p class="stat-change positive">+12% este mes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Ingresos</h3>
+                                <p class="stat-number">$1,850</p>
+                                <p class="stat-change positive">+8% este mes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Pendientes</h3>
+                                <p class="stat-number">5</p>
+                                <p class="stat-change neutral">Sin cambios</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Calificación</h3>
+                                <p class="stat-number">4.8</p>
+                                <p class="stat-change positive">+0.2 este mes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab de Configuración -->
+                <div id="configuracion" class="tab-content">
+                    <div class="config-section">
+                        <h3>Configuración General</h3>
+                        <div class="config-form">
+                            <div class="form-group">
+                                <label>Nombre del Negocio</label>
+                                <input type="text" value="B3stia's Cake" class="config-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Email de Contacto</label>
+                                <input type="email" value="info@brendab3stia.com" class="config-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="tel" value="+1 (555) 123-4567" class="config-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Horarios de Atención</label>
+                                <textarea class="config-input">Lunes - Viernes: 9:00 AM - 6:00 PM
+Sábados: 9:00 AM - 4:00 PM</textarea>
+                            </div>
+                            <button class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

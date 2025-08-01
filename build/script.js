@@ -1,5 +1,342 @@
+// ===== FUNCIONES GLOBALES =====
+
+// Función global para mostrar notificaciones
+function showNotification(message, type) {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+
+    // Estilos de la notificación
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        max-width: 400px;
+    `;
+
+    // Agregar al DOM
+    document.body.appendChild(notification);
+
+    // Animar entrada
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+
+    // Cerrar notificación
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', () => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    });
+
+    // Auto-cerrar después de 5 segundos
+    setTimeout(() => {
+        if (document.body.contains(notification)) {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+// Función global para verificar contraseña
+function checkPassword() {
+    const passwordInput = document.getElementById('adminPassword');
+    const passwordError = document.getElementById('passwordError');
+    const password = passwordInput.value.trim();
+    
+    if (password === '123') {
+        // Contraseña correcta
+        closePasswordModal();
+        openAdminPanel();
+        showNotification('Acceso autorizado al panel de administrador', 'success');
+    } else {
+        // Contraseña incorrecta
+        passwordError.style.display = 'flex';
+        passwordInput.value = '';
+        passwordInput.focus();
+        
+        // Animar el input
+        passwordInput.style.borderColor = '#dc3545';
+        setTimeout(() => {
+            passwordInput.style.borderColor = '#e1e1e1';
+        }, 1000);
+    }
+}
+
+// Función global para exportar pedidos a PDF
+async function exportarPedidos() {
+    try {
+        console.log('Iniciando exportación de PDF...');
+        
+        // Verificar que jsPDF esté disponible
+        if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+            console.error('jsPDF no está cargado');
+            showNotification('Error: jsPDF no está disponible', 'error');
+            return;
+        }
+        
+        const pedidos = cargarPedidosDesdeLocalStorage();
+        console.log('Pedidos cargados:', pedidos);
+        
+        if (pedidos.length === 0) {
+            showNotification('No hay pedidos para exportar', 'error');
+            return;
+        }
+        
+        showNotification('Generando PDF...', 'success');
+        
+        // Crear el PDF - intentar diferentes formas de acceder a jsPDF
+        let jsPDF;
+        if (typeof window.jspdf !== 'undefined') {
+            jsPDF = window.jspdf.jsPDF;
+        } else if (typeof window.jsPDF !== 'undefined') {
+            jsPDF = window.jsPDF;
+        } else {
+            throw new Error('jsPDF no está disponible');
+        }
+        
+        const doc = new jsPDF();
+        
+        // Configurar fuente y colores
+        doc.setFont('helvetica');
+        doc.setFontSize(20);
+        doc.setTextColor(244, 167, 185); // Color rosa de la marca
+        
+        // Título del documento
+        doc.text('B3stia\'s Cake - Reporte de Pedidos', 20, 30);
+        
+        // Línea decorativa
+        doc.setDrawColor(244, 167, 185);
+        doc.setLineWidth(0.5);
+        doc.line(20, 35, 190, 35);
+        
+        // Información del reporte
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Fecha de generación: ${new Date().toLocaleString('es-ES')}`, 20, 45);
+        doc.text(`Total de pedidos: ${pedidos.length}`, 20, 55);
+        
+        let yPosition = 75;
+        let pageNumber = 1;
+        
+        // Procesar cada pedido
+        for (let i = 0; i < pedidos.length; i++) {
+            const pedido = pedidos[i];
+            
+            // Verificar si necesitamos una nueva página
+            if (yPosition > 250) {
+                doc.addPage();
+                pageNumber++;
+                yPosition = 20;
+                
+                // Encabezado de página
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Página ${pageNumber}`, 20, 15);
+            }
+            
+            // Título del pedido
+            doc.setFontSize(16);
+            doc.setTextColor(244, 167, 185);
+            doc.text(`Pedido #${pedido.id}`, 20, yPosition);
+            
+            yPosition += 10;
+            
+            // Información del cliente
+            doc.setFontSize(11);
+            doc.setTextColor(60, 60, 60);
+            doc.text(`Cliente: ${pedido.nombre}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`Email: ${pedido.email}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`Teléfono: ${pedido.telefono}`, 20, yPosition);
+            yPosition += 10;
+            
+            // Detalles del pastel
+            doc.setFontSize(11);
+            doc.text(`Sabor: ${pedido.sabor}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`Tamaño: ${pedido.tamaño}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`Decoración: ${pedido.decoracion}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`Fecha de entrega: ${pedido.fechaEntrega}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`Estado: ${pedido.estado}`, 20, yPosition);
+            yPosition += 10;
+            
+            // Mensaje adicional
+            if (pedido.mensaje && pedido.mensaje.trim()) {
+                doc.text(`Mensaje: ${pedido.mensaje}`, 20, yPosition);
+                yPosition += 10;
+            }
+            
+            // Agregar imagen si existe
+            if (pedido.imagen) {
+                try {
+                    // Crear un elemento temporal para cargar la imagen
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        img.src = pedido.imagen;
+                    });
+                    
+                    // Convertir imagen a canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Agregar imagen al PDF
+                    const imgData = canvas.toDataURL('image/jpeg', 0.8);
+                    const imgWidth = 60;
+                    const imgHeight = (img.height * imgWidth) / img.width;
+                    
+                    if (yPosition + imgHeight > 250) {
+                        doc.addPage();
+                        pageNumber++;
+                        yPosition = 20;
+                    }
+                    
+                    doc.addImage(imgData, 'JPEG', 20, yPosition, imgWidth, imgHeight);
+                    yPosition += imgHeight + 10;
+                    
+                } catch (error) {
+                    console.error('Error al procesar imagen:', error);
+                    doc.text('Imagen no disponible', 20, yPosition);
+                    yPosition += 6;
+                }
+            }
+            
+            // Línea separadora
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.2);
+            doc.line(20, yPosition, 190, yPosition);
+            yPosition += 15;
+        }
+        
+        // Pie de página
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('B3stia\'s Cake - Pastelería Artesanal', 20, 280);
+        
+        // Guardar el PDF
+        const fileName = `pedidos_b3stias_cake_${new Date().toISOString().split('T')[0]}.pdf`;
+        console.log('Guardando PDF con nombre:', fileName);
+        doc.save(fileName);
+        
+        console.log('PDF guardado exitosamente');
+        showNotification('PDF generado y descargado correctamente', 'success');
+        
+    } catch (error) {
+        console.error('Error al exportar pedidos a PDF:', error);
+        showNotification('Error al generar el PDF', 'error');
+    }
+}
+
+// Función global de prueba para verificar PDF
+function testPDF() {
+    try {
+        console.log('Iniciando prueba de PDF...');
+        
+        // Verificar que jsPDF esté disponible
+        if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+            console.error('jsPDF no está cargado');
+            showNotification('Error: jsPDF no está disponible', 'error');
+            return;
+        }
+        
+        // Intentar diferentes formas de acceder a jsPDF
+        let jsPDF;
+        if (typeof window.jspdf !== 'undefined') {
+            jsPDF = window.jspdf.jsPDF;
+        } else if (typeof window.jsPDF !== 'undefined') {
+            jsPDF = window.jsPDF;
+        } else {
+            throw new Error('jsPDF no está disponible');
+        }
+        
+        console.log('jsPDF disponible, creando documento de prueba...');
+        
+        // Crear un PDF simple de prueba
+        const doc = new jsPDF();
+        doc.setFont('helvetica');
+        doc.setFontSize(20);
+        doc.text('Prueba de PDF - B3stia\'s Cake', 20, 30);
+        doc.setFontSize(12);
+        doc.text('Este es un documento de prueba', 20, 50);
+        doc.text(`Fecha: ${new Date().toLocaleString('es-ES')}`, 20, 70);
+        
+        const fileName = `test_pdf_${new Date().toISOString().split('T')[0]}.pdf`;
+        console.log('Guardando PDF de prueba:', fileName);
+        doc.save(fileName);
+        
+        console.log('PDF de prueba guardado exitosamente');
+        showNotification('PDF de prueba generado correctamente', 'success');
+        
+    } catch (error) {
+        console.error('Error en prueba de PDF:', error);
+        showNotification('Error en prueba de PDF: ' + error.message, 'error');
+    }
+}
+
+// Función global para verificar el estado de las librerías PDF
+function verificarLibreriasPDF() {
+    console.log('=== Verificación de Librerías PDF ===');
+    console.log('window.jspdf:', typeof window.jspdf);
+    console.log('window.jsPDF:', typeof window.jsPDF);
+    
+    if (typeof window.jspdf !== 'undefined') {
+        console.log('window.jspdf.jsPDF:', typeof window.jspdf.jsPDF);
+    }
+    
+    if (typeof window.jsPDF !== 'undefined') {
+        console.log('window.jsPDF disponible');
+    }
+    
+    console.log('html2canvas:', typeof window.html2canvas);
+    console.log('===============================');
+    
+    let mensaje = 'Estado de librerías:\n';
+    mensaje += `jsPDF: ${typeof window.jspdf !== 'undefined' ? 'Cargado' : 'No cargado'}\n`;
+    mensaje += `html2canvas: ${typeof window.html2canvas !== 'undefined' ? 'Cargado' : 'No cargado'}`;
+    
+    showNotification(mensaje, 'info');
+}
+
 // Esperar a que el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // Verificar que las librerías PDF se carguen correctamente
+    setTimeout(() => {
+        console.log('=== Verificación inicial de librerías ===');
+        console.log('jsPDF disponible:', typeof window.jspdf !== 'undefined' || typeof window.jsPDF !== 'undefined');
+        console.log('html2canvas disponible:', typeof window.html2canvas !== 'undefined');
+    }, 1000);
     
     // ===== NAVEGACIÓN MÓVIL =====
     const hamburger = document.querySelector('.hamburger');
@@ -94,8 +431,61 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (isValid) {
+                // Recopilar datos del formulario
+                const formData = new FormData(customForm);
+                
+                // Capturar la imagen si existe
+                const imagenInput = customForm.querySelector('#foto-referencia');
+                let imagenUrl = '';
+                
+                if (imagenInput && imagenInput.files && imagenInput.files[0]) {
+                    const file = imagenInput.files[0];
+                    imagenUrl = URL.createObjectURL(file);
+                }
+                
+                // Recopilar datos detallados del formulario
+                const saboresSeleccionados = Array.from(document.querySelectorAll('.custom-form input[name="sabores"]:checked'))
+                    .map(checkbox => checkbox.parentElement.textContent.trim());
+                
+                const rellenosSeleccionados = Array.from(document.querySelectorAll('.custom-form input[name="rellenos"]:checked'))
+                    .map(checkbox => checkbox.parentElement.textContent.trim());
+                
+                const decoracionesSeleccionadas = Array.from(document.querySelectorAll('.custom-form input[name="decoraciones"]:checked'))
+                    .map(checkbox => checkbox.parentElement.textContent.trim());
+                
+                const cantidad = formData.get('cantidad') || '1';
+                const decoracionEspecial = formData.get('decoracion-especial') || '';
+                const precioTotal = document.getElementById('precio-total-personalizado')?.textContent || '0';
+                
+                const pedidoData = {
+                    id: Date.now(), // ID único basado en timestamp
+                    fecha: new Date().toLocaleString(),
+                    nombre: formData.get('nombre'),
+                    email: formData.get('email'),
+                    telefono: formData.get('telefono'),
+                    tamaño: formData.get('tamaño'),
+                    sabores: saboresSeleccionados,
+                    rellenos: rellenosSeleccionados,
+                    decoraciones: decoracionesSeleccionadas,
+                    cantidad: cantidad,
+                    decoracionEspecial: decoracionEspecial,
+                    precioTotal: precioTotal,
+                    fechaEntrega: formData.get('fecha'),
+                    mensaje: formData.get('mensaje'),
+                    imagen: imagenUrl,
+                    estado: 'Pendiente'
+                };
+                
+                // Agregar el pedido al panel de administrador
+                agregarPedidoAlPanel(pedidoData);
+                
+                // Mostrar notificación de éxito
                 showNotification('¡Pedido enviado con éxito! Te contactaremos pronto.', 'success');
-                customForm.reset();
+                
+                // Limpiar solo los campos de error visual
+                requiredFields.forEach(field => {
+                    field.style.borderColor = '#e1e1e1';
+                });
             } else {
                 showNotification('Por favor, completa todos los campos requeridos.', 'error');
             }
@@ -146,62 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ===== FUNCIÓN DE NOTIFICACIONES =====
-    function showNotification(message, type) {
-        // Crear elemento de notificación
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-content">
-                <span class="notification-message">${message}</span>
-                <button class="notification-close">&times;</button>
-            </div>
-        `;
 
-        // Estilos de la notificación
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 10000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 400px;
-        `;
-
-        // Agregar al DOM
-        document.body.appendChild(notification);
-
-        // Animar entrada
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-
-        // Cerrar notificación
-        const closeBtn = notification.querySelector('.notification-close');
-        closeBtn.addEventListener('click', () => {
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        });
-
-        // Auto-cerrar después de 5 segundos
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }
-        }, 5000);
-    }
 
     // ===== VALIDACIÓN DE EMAIL =====
     function isValidEmail(email) {
@@ -361,268 +696,136 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Brenda B3stia\'s Cake - Sitio web cargado exitosamente! 🎂');
     
-    // ===== CALCULADORA DE PRECIOS =====
-    initCalculadora();
+
+    
+    // ===== CALCULADORA DE PRECIOS EN PEDIDOS PERSONALIZADOS =====
+    initCalculadoraPersonalizados();
     
     // ===== SUBIDA DE ARCHIVOS =====
     initFileUpload();
 });
 
-// ===== FUNCIONALIDAD DE LA CALCULADORA =====
-function initCalculadora() {
-    const tamanoSelect = document.getElementById('tamano');
-    const cantidadInput = document.getElementById('cantidad');
-    const checkboxes = document.querySelectorAll('.checkbox-item input[type="checkbox"]');
-    const precioTotalElement = document.getElementById('precio-total');
-    const desgloseLista = document.getElementById('desglose-lista');
-    const limpiarBtn = document.getElementById('limpiar-calculadora');
-    
-    let precioBase = 0;
-    let precioSabores = 0;
-    let precioRellenos = 0;
-    let precioDecoraciones = 0;
-    let cantidad = 1;
-    
-    // Función para calcular el precio total
-    function calcularPrecio() {
-        const precioTotal = (precioBase + precioSabores + precioRellenos + precioDecoraciones) * cantidad;
-        precioTotalElement.textContent = precioTotal.toFixed(2);
-        actualizarDesglose();
-    }
-    
-    // Función para actualizar el desglose
-    function actualizarDesglose() {
-        const desgloseItems = [];
+
+
+// ===== FUNCIONALIDAD DE CALCULADORA EN PEDIDOS PERSONALIZADOS =====
+function initCalculadoraPersonalizados() {
+    function calcularPrecioPersonalizados() {
+        const tamanoSelect = document.getElementById('tamaño');
+        const cantidadInput = document.getElementById('cantidad');
+        const precioTotalElement = document.getElementById('precio-total-personalizado');
+        const desgloseElement = document.getElementById('desglose-lista-personalizado');
         
-        if (precioBase > 0) {
-            desgloseItems.push({
-                nombre: 'Precio base',
+        if (!tamanoSelect || !cantidadInput || !precioTotalElement || !desgloseElement) {
+            return; // Elementos no encontrados
+        }
+        
+        let precioBase = 0;
+        let precioAdicional = 0;
+        const desglose = [];
+        
+        // Calcular precio base por tamaño
+        if (tamanoSelect.value) {
+            const tamanoOption = tamanoSelect.options[tamanoSelect.selectedIndex];
+            precioBase = parseInt(tamanoOption.getAttribute('data-precio')) || 0;
+            desglose.push({
+                item: tamanoOption.text,
                 precio: precioBase
             });
         }
         
-        // Obtener sabores seleccionados
-        const saboresSeleccionados = document.querySelectorAll('input[name="sabores"]:checked');
-        saboresSeleccionados.forEach(sabor => {
-            const precio = parseFloat(sabor.dataset.precio);
+        // Calcular precio por sabores seleccionados
+        const saboresSeleccionados = document.querySelectorAll('.custom-form input[name="sabores"]:checked');
+        saboresSeleccionados.forEach(checkbox => {
+            const precio = parseInt(checkbox.getAttribute('data-precio')) || 0;
+            precioAdicional += precio;
             if (precio > 0) {
-                desgloseItems.push({
-                    nombre: sabor.parentElement.textContent.trim(),
+                desglose.push({
+                    item: checkbox.parentElement.textContent.trim(),
                     precio: precio
                 });
             }
         });
         
-        // Obtener rellenos seleccionados
-        const rellenosSeleccionados = document.querySelectorAll('input[name="rellenos"]:checked');
-        rellenosSeleccionados.forEach(relleno => {
-            const precio = parseFloat(relleno.dataset.precio);
-            desgloseItems.push({
-                nombre: relleno.parentElement.textContent.trim(),
+        // Calcular precio por rellenos seleccionados
+        const rellenosSeleccionados = document.querySelectorAll('.custom-form input[name="rellenos"]:checked');
+        rellenosSeleccionados.forEach(checkbox => {
+            const precio = parseInt(checkbox.getAttribute('data-precio')) || 0;
+            precioAdicional += precio;
+            desglose.push({
+                item: checkbox.parentElement.textContent.trim(),
                 precio: precio
             });
         });
         
-        // Obtener decoraciones seleccionadas
-        const decoracionesSeleccionadas = document.querySelectorAll('input[name="decoraciones"]:checked');
-        decoracionesSeleccionadas.forEach(decoracion => {
-            const precio = parseFloat(decoracion.dataset.precio);
-            desgloseItems.push({
-                nombre: decoracion.parentElement.textContent.trim(),
+        // Calcular precio por decoraciones seleccionadas
+        const decoracionesSeleccionadas = document.querySelectorAll('.custom-form input[name="decoraciones"]:checked');
+        decoracionesSeleccionadas.forEach(checkbox => {
+            const precio = parseInt(checkbox.getAttribute('data-precio')) || 0;
+            precioAdicional += precio;
+            desglose.push({
+                item: checkbox.parentElement.textContent.trim(),
                 precio: precio
             });
         });
         
-        // Mostrar desglose
-        if (desgloseItems.length === 0) {
-            desgloseLista.innerHTML = '<p class="no-seleccion">Selecciona opciones para ver el desglose</p>';
-        } else {
+        // Calcular precio total
+        const cantidad = parseInt(cantidadInput.value) || 1;
+        const precioTotal = (precioBase + precioAdicional) * cantidad;
+        
+        // Actualizar precio total
+        precioTotalElement.textContent = precioTotal;
+        
+        // Actualizar desglose
+        if (desglose.length > 0) {
             let desgloseHTML = '';
-            let subtotal = 0;
-            
-            desgloseItems.forEach(item => {
-                subtotal += item.precio;
+            desglose.forEach(item => {
                 desgloseHTML += `
                     <div class="desglose-item">
-                        <span>${item.nombre}</span>
-                        <span>$${item.precio.toFixed(2)}</span>
+                        <span>${item.item}</span>
+                        <span>$${item.precio}</span>
                     </div>
                 `;
             });
-            
             desgloseHTML += `
-                <div class="desglose-item">
-                    <span>Subtotal</span>
-                    <span>$${subtotal.toFixed(2)}</span>
-                </div>
-                <div class="desglose-item">
-                    <span>Cantidad</span>
-                    <span>×${cantidad}</span>
+                <div class="desglose-item" style="border-top: 1px solid #ddd; padding-top: 5px; font-weight: bold;">
+                    <span>Total por unidad</span>
+                    <span>$${precioBase + precioAdicional}</span>
                 </div>
             `;
-            
-            desgloseLista.innerHTML = desgloseHTML;
+            if (cantidad > 1) {
+                desgloseHTML += `
+                    <div class="desglose-item" style="font-weight: bold; color: var(--color-primary);">
+                        <span>Cantidad: ${cantidad}</span>
+                        <span>$${precioTotal}</span>
+                    </div>
+                `;
+            }
+            desgloseElement.innerHTML = desgloseHTML;
+        } else {
+            desgloseElement.innerHTML = '<p class="no-seleccion">Selecciona opciones para ver el desglose</p>';
         }
     }
     
-    // Event listeners
-    tamanoSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        precioBase = selectedOption.dataset.precio ? parseFloat(selectedOption.dataset.precio) : 0;
-        calcularPrecio();
+    // Event listeners para la calculadora de pedidos personalizados
+    const tamanoSelect = document.getElementById('tamaño');
+    const cantidadInput = document.getElementById('cantidad');
+    
+    if (tamanoSelect) {
+        tamanoSelect.addEventListener('change', calcularPrecioPersonalizados);
+    }
+    
+    if (cantidadInput) {
+        cantidadInput.addEventListener('change', calcularPrecioPersonalizados);
+    }
+    
+    // Event listeners para checkboxes en pedidos personalizados
+    const checkboxesPersonalizados = document.querySelectorAll('.custom-form input[type="checkbox"]');
+    checkboxesPersonalizados.forEach(checkbox => {
+        checkbox.addEventListener('change', calcularPrecioPersonalizados);
     });
     
-    cantidadInput.addEventListener('change', function() {
-        cantidad = parseInt(this.value) || 1;
-        calcularPrecio();
-    });
-    
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const precio = parseFloat(this.dataset.precio) || 0;
-            const categoria = this.name;
-            
-            if (this.checked) {
-                if (categoria === 'sabores') {
-                    precioSabores += precio;
-                } else if (categoria === 'rellenos') {
-                    precioRellenos += precio;
-                } else if (categoria === 'decoraciones') {
-                    precioDecoraciones += precio;
-                }
-            } else {
-                if (categoria === 'sabores') {
-                    precioSabores -= precio;
-                } else if (categoria === 'rellenos') {
-                    precioRellenos -= precio;
-                } else if (categoria === 'decoraciones') {
-                    precioDecoraciones -= precio;
-                }
-            }
-            
-                    calcularPrecio();
-        });
-    });
-    
-    // Botón limpiar
-    limpiarBtn.addEventListener('click', function() {
-        tamanoSelect.value = '';
-        cantidadInput.value = 1;
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        precioBase = 0;
-        precioSabores = 0;
-        precioRellenos = 0;
-        precioDecoraciones = 0;
-        cantidad = 1;
-        
-        calcularPrecio();
-    });
-}
-
-// ===== FUNCIONALIDAD DE SUBIDA DE ARCHIVOS =====
-function initFileUpload() {
-    const fileInput = document.getElementById('foto-referencia');
-    const filePreview = document.getElementById('file-preview');
-    const previewImage = document.getElementById('preview-image');
-    const removeFileBtn = document.getElementById('remove-file');
-    
-    if (!fileInput) return;
-    
-    // Manejar selección de archivo
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        
-        if (file) {
-            // Validar tipo de archivo
-            if (!file.type.startsWith('image/')) {
-                showNotification('Por favor, selecciona solo archivos de imagen.', 'error');
-                return;
-            }
-            
-            // Validar tamaño (5MB máximo)
-            const maxSize = 5 * 1024 * 1024; // 5MB en bytes
-            if (file.size > maxSize) {
-                showNotification('El archivo es demasiado grande. Máximo 5MB.', 'error');
-                return;
-            }
-            
-            // Crear URL para vista previa
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImage.src = e.target.result;
-                filePreview.style.display = 'block';
-                
-                // Animar la aparición
-                filePreview.style.opacity = '0';
-                filePreview.style.transform = 'translateY(10px)';
-                
-                setTimeout(() => {
-                    filePreview.style.transition = 'all 0.3s ease';
-                    filePreview.style.opacity = '1';
-                    filePreview.style.transform = 'translateY(0)';
-                }, 10);
-            };
-            reader.readAsDataURL(file);
-            
-            showNotification('Imagen cargada exitosamente. Puedes ver la vista previa.', 'success');
-        }
-    });
-    
-    // Manejar eliminación de archivo
-    removeFileBtn.addEventListener('click', function() {
-        fileInput.value = '';
-        filePreview.style.display = 'none';
-        previewImage.src = '';
-        
-        showNotification('Imagen eliminada.', 'success');
-    });
-    
-    // Drag and drop functionality
-    const uploadLabel = document.querySelector('.file-upload-label');
-    
-    uploadLabel.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '#F4A7B9';
-        this.style.background = 'rgba(244, 167, 185, 0.1)';
-    });
-    
-    uploadLabel.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '';
-        this.style.background = '';
-    });
-    
-    uploadLabel.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '';
-        this.style.background = '';
-        
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            fileInput.files = files;
-            fileInput.dispatchEvent(new Event('change'));
-        }
-    });
-    
-    // Botón limpiar
-    limpiarBtn.addEventListener('click', function() {
-        tamanoSelect.value = '';
-        cantidadInput.value = 1;
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        precioBase = 0;
-        precioSabores = 0;
-        precioRellenos = 0;
-        precioDecoraciones = 0;
-        cantidad = 1;
-        
-        calcularPrecio();
-    });
+    // Calcular precio inicial
+    calcularPrecioPersonalizados();
 }
 
 // ===== FUNCIONALIDAD DE SUBIDA DE ARCHIVOS =====
@@ -713,4 +916,692 @@ function initFileUpload() {
     }
 }
 
- 
+// ===== FUNCIONALIDAD DEL TRIPLE CLIC PARA ADMINISTRADOR =====
+
+// Variables para el sistema de triple clic
+let clickCount = 0;
+let clickTimer = null;
+const TRIPLE_CLICK_DELAY = 500; // 500ms para considerar triple clic
+
+// Función para manejar el clic en el logo
+function handleLogoClick() {
+    clickCount++;
+    
+    // Limpiar timer anterior si existe
+    if (clickTimer) {
+        clearTimeout(clickTimer);
+    }
+    
+    // Si es el primer clic, iniciar timer
+    if (clickCount === 1) {
+        clickTimer = setTimeout(() => {
+            // Si no se completó el triple clic, resetear contador
+            if (clickCount < 3) {
+                clickCount = 0;
+            }
+        }, TRIPLE_CLICK_DELAY);
+    }
+    
+    // Si se completó el triple clic
+    if (clickCount === 3) {
+        clickCount = 0; // Resetear contador
+        if (clickTimer) {
+            clearTimeout(clickTimer);
+        }
+        
+        // Mostrar modal de contraseña
+        showPasswordModal();
+    } else if (clickCount === 2) {
+        // Mostrar indicador sutil para el segundo clic
+        showTripleClickIndicator();
+    }
+}
+
+// ===== FUNCIONALIDAD DEL MODAL DE CONTRASEÑA =====
+
+// Función para mostrar el modal de contraseña
+function showPasswordModal() {
+    const passwordModal = document.getElementById('passwordModal');
+    passwordModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Enfocar el input de contraseña
+    const passwordInput = document.getElementById('adminPassword');
+    passwordInput.focus();
+    
+    // Limpiar campos anteriores
+    passwordInput.value = '';
+    document.getElementById('passwordError').style.display = 'none';
+}
+
+// Función para cerrar el modal de contraseña
+function closePasswordModal() {
+    const passwordModal = document.getElementById('passwordModal');
+    passwordModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+
+
+// Event listeners para el modal de contraseña
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordModal = document.getElementById('passwordModal');
+    const passwordInput = document.getElementById('adminPassword');
+    
+    // Cerrar modal al hacer clic fuera de él
+    passwordModal.addEventListener('click', function(e) {
+        if (e.target === passwordModal) {
+            closePasswordModal();
+        }
+    });
+    
+    // Cerrar con Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && passwordModal.classList.contains('active')) {
+            closePasswordModal();
+        }
+    });
+    
+    // Ingresar con Enter
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
+});
+
+// ===== FUNCIONALIDAD DEL PANEL DE ADMINISTRADOR =====
+
+// Función para abrir el panel de administrador
+function openAdminPanel() {
+    const adminPanel = document.getElementById('adminPanel');
+    adminPanel.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    
+    // Cargar datos de pedidos (simulado)
+    cargarPedidos();
+}
+
+// Función para cerrar el panel de administrador
+function closeAdminPanel() {
+    const adminPanel = document.getElementById('adminPanel');
+    adminPanel.classList.remove('active');
+    document.body.style.overflow = ''; // Restaurar scroll del body
+}
+
+// Función para cambiar entre tabs
+function showTab(tabName) {
+    // Ocultar todos los tabs
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(tab => tab.classList.remove('active'));
+    
+    // Desactivar todos los botones de tab
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Mostrar el tab seleccionado
+    const selectedTab = document.getElementById(tabName);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+    
+    // Activar el botón correspondiente
+    const selectedButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+    }
+}
+
+// Función para cargar pedidos (simulado)
+function cargarPedidos() {
+    const pedidos = cargarPedidosDesdeLocalStorage();
+    const pedidosLista = document.querySelector('.pedidos-lista');
+    
+    if (!pedidosLista) {
+        console.error('No se encontró la lista de pedidos en el panel de administrador');
+        return;
+    }
+    
+    // Limpiar la lista actual
+    pedidosLista.innerHTML = '';
+    
+    if (pedidos.length === 0) {
+        pedidosLista.innerHTML = `
+            <div class="pedido-item vacio">
+                <div class="pedido-info">
+                    <p>No hay pedidos registrados</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Agregar cada pedido a la lista
+    pedidos.forEach(pedido => {
+        const pedidoHTML = `
+            <div class="pedido-item" data-pedido-id="${pedido.id}">
+                <div class="pedido-info">
+                    <div class="pedido-header">
+                        <h4>Pedido #${pedido.id}</h4>
+                        <span class="pedido-fecha">${pedido.fecha}</span>
+                    </div>
+                    <div class="pedido-detalles">
+                        <p><strong>Cliente:</strong> ${pedido.nombre}</p>
+                        <p><strong>Contacto:</strong> ${pedido.email} | ${pedido.telefono}</p>
+                        <p><strong>Pastel:</strong> ${pedido.sabor} - ${pedido.tamaño}</p>
+                        <p><strong>Decoración:</strong> ${pedido.decoracion}</p>
+                        <p><strong>Entrega:</strong> ${pedido.fechaEntrega}</p>
+                        ${pedido.mensaje ? `<p><strong>Mensaje:</strong> ${pedido.mensaje}</p>` : ''}
+                    </div>
+                </div>
+                <div class="pedido-estado ${pedido.estado.toLowerCase().replace(' ', '-')}">${pedido.estado}</div>
+                <div class="pedido-acciones">
+                    <button class="btn-accion btn-ver" onclick="verPedido('${pedido.id}')">
+                        <i class="fas fa-eye"></i> Ver
+                    </button>
+                    <button class="btn-accion btn-estado" onclick="cambiarEstado('${pedido.id}')">
+                        ${pedido.estado === 'Pendiente' ? '<i class="fas fa-play"></i> Iniciar' : 
+                          pedido.estado === 'En proceso' ? '<i class="fas fa-check"></i> Completar' : 
+                          '<i class="fas fa-check"></i> Completado'}
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        pedidosLista.insertAdjacentHTML('beforeend', pedidoHTML);
+    });
+    
+    console.log('Pedidos cargados desde localStorage:', pedidos.length);
+}
+
+// Función para ver detalles de un pedido
+function verPedido(pedidoId) {
+    // Buscar el pedido completo en localStorage
+    const pedidos = cargarPedidosDesdeLocalStorage();
+    const pedido = pedidos.find(p => p.id == pedidoId);
+    
+    if (!pedido) {
+        showNotification('Pedido no encontrado', 'error');
+        return;
+    }
+    
+    // Crear el modal de detalles del pedido
+    const modalHTML = `
+        <div id="pedidoModal" class="pedido-modal">
+            <div class="pedido-modal-content">
+                <div class="pedido-modal-header">
+                    <h2>Pedido #${pedidoId}</h2>
+                    <button class="close-pedido-btn" onclick="closePedidoModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="pedido-modal-body">
+                    <div class="pedido-section">
+                        <h3>Información del Cliente</h3>
+                        <div class="pedido-info-grid">
+                            <div class="pedido-info-item">
+                                <strong>Nombre:</strong>
+                                <span>${pedido.nombre}</span>
+                            </div>
+                            <div class="pedido-info-item">
+                                <strong>Email:</strong>
+                                <span>${pedido.email}</span>
+                            </div>
+                            <div class="pedido-info-item">
+                                <strong>Teléfono:</strong>
+                                <span>${pedido.telefono}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pedido-section">
+                        <h3>Detalles del Pastel</h3>
+                        <div class="pedido-info-grid">
+                            <div class="pedido-info-item">
+                                <strong>Tamaño:</strong>
+                                <span>${pedido.tamaño}</span>
+                            </div>
+                            <div class="pedido-info-item">
+                                <strong>Cantidad:</strong>
+                                <span>${pedido.cantidad || '1'}</span>
+                            </div>
+                            <div class="pedido-info-item">
+                                <strong>Precio Total:</strong>
+                                <span>$${pedido.precioTotal || '0'}</span>
+                            </div>
+                            <div class="pedido-info-item">
+                                <strong>Fecha de Entrega:</strong>
+                                <span>${pedido.fechaEntrega}</span>
+                            </div>
+                        </div>
+                        
+                        ${pedido.sabores && pedido.sabores.length > 0 ? `
+                        <div class="pedido-info-item full-width">
+                            <strong>Sabores Seleccionados:</strong>
+                            <span>${pedido.sabores.join(', ')}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${pedido.rellenos && pedido.rellenos.length > 0 ? `
+                        <div class="pedido-info-item full-width">
+                            <strong>Rellenos Seleccionados:</strong>
+                            <span>${pedido.rellenos.join(', ')}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${pedido.decoraciones && pedido.decoraciones.length > 0 ? `
+                        <div class="pedido-info-item full-width">
+                            <strong>Decoraciones Seleccionadas:</strong>
+                            <span>${pedido.decoraciones.join(', ')}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${pedido.decoracionEspecial ? `
+                        <div class="pedido-info-item full-width">
+                            <strong>Decoración Especial:</strong>
+                            <span>${pedido.decoracionEspecial}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${pedido.mensaje ? `
+                        <div class="pedido-info-item full-width">
+                            <strong>Mensaje Especial:</strong>
+                            <span>${pedido.mensaje}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="pedido-section">
+                        <h3>Imagen de Referencia</h3>
+                        <div class="pedido-image-section">
+                            ${pedido.imagen ? `
+                            <div class="pedido-image-container">
+                                <img src="${pedido.imagen}" alt="Imagen de referencia del pastel" />
+                            </div>
+                            ` : `
+                            <div class="pedido-no-image">
+                                <img src="Public/logo.jpg" alt="B3stia's Cake Logo" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px;" />
+                                <p>No se proporcionó imagen de referencia</p>
+                            </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agregar el modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Mostrar el modal
+    const modal = document.getElementById('pedidoModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Event listener para cerrar al hacer clic fuera del modal
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closePedidoModal();
+        }
+    });
+    
+    // Event listener para cerrar con Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closePedidoModal();
+        }
+    });
+}
+
+// Función para cerrar el modal de detalles del pedido
+function closePedidoModal() {
+    const modal = document.getElementById('pedidoModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Remover el modal del DOM después de la animación
+        setTimeout(() => {
+            if (document.body.contains(modal)) {
+                document.body.removeChild(modal);
+            }
+        }, 300);
+    }
+}
+
+// Función para editar un pedido
+function editarPedido(pedidoId) {
+    showNotification(`Editando pedido #${pedidoId}`, 'success');
+    // Aquí se podría abrir un formulario de edición
+}
+
+// Función para cambiar el estado de un pedido
+function cambiarEstado(pedidoId) {
+    const pedidoItem = document.querySelector(`[onclick="verPedido('${pedidoId}')"]`).closest('.pedido-item');
+    const estadoElement = pedidoItem.querySelector('.pedido-estado');
+    const btnEstado = pedidoItem.querySelector('.btn-estado');
+    
+    let nuevoEstado = '';
+    
+    // Simular cambio de estado
+    if (estadoElement.classList.contains('pendiente')) {
+        estadoElement.textContent = 'En proceso';
+        estadoElement.className = 'pedido-estado en-proceso';
+        btnEstado.innerHTML = '<i class="fas fa-check"></i> Completar';
+        btnEstado.onclick = () => cambiarEstado(pedidoId);
+        nuevoEstado = 'En proceso';
+    } else if (estadoElement.classList.contains('en-proceso')) {
+        estadoElement.textContent = 'Completado';
+        estadoElement.className = 'pedido-estado completado';
+        btnEstado.innerHTML = '<i class="fas fa-truck"></i> Entregar';
+        btnEstado.onclick = () => cambiarEstado(pedidoId);
+        nuevoEstado = 'Completado';
+    } else if (estadoElement.classList.contains('completado')) {
+        estadoElement.textContent = 'Entregado';
+        estadoElement.className = 'pedido-estado entregado';
+        btnEstado.innerHTML = '<i class="fas fa-check-double"></i> Entregado';
+        btnEstado.style.background = '#6c757d';
+        btnEstado.disabled = true;
+        nuevoEstado = 'Entregado';
+    }
+    
+    // Actualizar el estado en localStorage
+    if (nuevoEstado) {
+        actualizarEstadoPedidoEnLocalStorage(pedidoId, nuevoEstado);
+    }
+    
+    showNotification(`Estado del pedido #${pedidoId} actualizado`, 'success');
+}
+
+// Cerrar panel al hacer clic fuera de él
+document.addEventListener('DOMContentLoaded', function() {
+    const adminPanel = document.getElementById('adminPanel');
+    
+    adminPanel.addEventListener('click', function(e) {
+        if (e.target === adminPanel) {
+            closeAdminPanel();
+        }
+    });
+    
+    // Cerrar con la tecla Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && adminPanel.classList.contains('active')) {
+            closeAdminPanel();
+        }
+    });
+});
+
+// Función para filtrar pedidos
+function filtrarPedidos() {
+    const filtroEstado = document.getElementById('filtroEstado').value;
+    const filtroFecha = document.getElementById('filtroFecha').value;
+    
+    // Aquí se implementaría la lógica de filtrado
+    console.log('Filtrando pedidos:', { estado: filtroEstado, fecha: filtroFecha });
+    showNotification('Filtros aplicados', 'success');
+}
+
+// Event listeners para filtros
+document.addEventListener('DOMContentLoaded', function() {
+    const filtroEstado = document.getElementById('filtroEstado');
+    const filtroFecha = document.getElementById('filtroFecha');
+    
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', filtrarPedidos);
+    }
+    
+    if (filtroFecha) {
+        filtroFecha.addEventListener('change', filtrarPedidos);
+    }
+});
+
+// ===== FUNCIÓN PARA AGREGAR PEDIDOS AL PANEL DE ADMINISTRADOR =====
+
+// Función para agregar un nuevo pedido al panel de administrador
+function agregarPedidoAlPanel(pedidoData) {
+    // Guardar el pedido en localStorage
+    agregarPedidoALocalStorage(pedidoData);
+    
+    const pedidosLista = document.querySelector('.pedidos-lista');
+    
+    if (!pedidosLista) {
+        console.error('No se encontró la lista de pedidos en el panel de administrador');
+        return;
+    }
+    
+    // Crear el elemento HTML del pedido
+    const pedidoHTML = `
+        <div class="pedido-item" data-pedido-id="${pedidoData.id}">
+            <div class="pedido-info">
+                <div class="pedido-header">
+                    <h4>Pedido #${pedidoData.id}</h4>
+                    <span class="pedido-fecha">${pedidoData.fecha}</span>
+                </div>
+                <div class="pedido-detalles">
+                    <p><strong>Cliente:</strong> ${pedidoData.nombre}</p>
+                    <p><strong>Contacto:</strong> ${pedidoData.email} | ${pedidoData.telefono}</p>
+                    <p><strong>Pastel:</strong> ${pedidoData.sabor} - ${pedidoData.tamaño}</p>
+                    <p><strong>Decoración:</strong> ${pedidoData.decoracion}</p>
+                    <p><strong>Entrega:</strong> ${pedidoData.fechaEntrega}</p>
+                    ${pedidoData.mensaje ? `<p><strong>Mensaje:</strong> ${pedidoData.mensaje}</p>` : ''}
+                </div>
+            </div>
+            <div class="pedido-estado pendiente">${pedidoData.estado}</div>
+            <div class="pedido-acciones">
+                                    <button class="btn-accion btn-ver" onclick="verPedido('${pedidoData.id}')">
+                    <i class="fas fa-eye"></i> Ver
+                </button>
+                <button class="btn-accion btn-estado" onclick="cambiarEstado('${pedidoData.id}')">
+                    <i class="fas fa-play"></i> Iniciar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Agregar el pedido al inicio de la lista
+    pedidosLista.insertAdjacentHTML('afterbegin', pedidoHTML);
+    
+    // Animar la aparición del nuevo pedido
+    const nuevoPedido = pedidosLista.querySelector(`[data-pedido-id="${pedidoData.id}"]`);
+    if (nuevoPedido) {
+        nuevoPedido.style.opacity = '0';
+        nuevoPedido.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            nuevoPedido.style.transition = 'all 0.3s ease';
+            nuevoPedido.style.opacity = '1';
+            nuevoPedido.style.transform = 'translateY(0)';
+        }, 10);
+    }
+    
+    console.log('Nuevo pedido agregado al panel y localStorage:', pedidoData);
+}
+
+// Función para mostrar indicador de triple clic
+function showTripleClickIndicator() {
+    // Crear indicador sutil
+    const indicator = document.createElement('div');
+    indicator.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
+    indicator.textContent = 'Un clic más para acceso administrativo';
+    
+    document.body.appendChild(indicator);
+    
+    // Animar entrada
+    setTimeout(() => {
+        indicator.style.opacity = '1';
+    }, 10);
+    
+    // Remover después de 1.5 segundos
+    setTimeout(() => {
+        indicator.style.opacity = '0';
+        setTimeout(() => {
+            if (document.body.contains(indicator)) {
+                document.body.removeChild(indicator);
+            }
+        }, 300);
+    }, 1500);
+}
+
+// ===== FUNCIONES DE ALMACENAMIENTO LOCAL =====
+
+// Función para guardar pedidos en localStorage
+function guardarPedidosEnLocalStorage(pedidos) {
+    try {
+        localStorage.setItem('pasteleria_pedidos', JSON.stringify(pedidos));
+        console.log('Pedidos guardados en localStorage:', pedidos.length);
+    } catch (error) {
+        console.error('Error al guardar pedidos en localStorage:', error);
+    }
+}
+
+// Función para cargar pedidos desde localStorage
+function cargarPedidosDesdeLocalStorage() {
+    try {
+        const pedidosGuardados = localStorage.getItem('pasteleria_pedidos');
+        if (pedidosGuardados) {
+            const pedidos = JSON.parse(pedidosGuardados);
+            console.log('Pedidos cargados desde localStorage:', pedidos.length);
+            return pedidos;
+        }
+    } catch (error) {
+        console.error('Error al cargar pedidos desde localStorage:', error);
+    }
+    return [];
+}
+
+// Función para agregar un nuevo pedido al localStorage
+function agregarPedidoALocalStorage(pedidoData) {
+    const pedidos = cargarPedidosDesdeLocalStorage();
+    pedidos.unshift(pedidoData); // Agregar al inicio
+    guardarPedidosEnLocalStorage(pedidos);
+}
+
+// Función para actualizar el estado de un pedido en localStorage
+function actualizarEstadoPedidoEnLocalStorage(pedidoId, nuevoEstado) {
+    const pedidos = cargarPedidosDesdeLocalStorage();
+    const pedidoIndex = pedidos.findIndex(pedido => pedido.id == pedidoId);
+    
+    if (pedidoIndex !== -1) {
+        pedidos[pedidoIndex].estado = nuevoEstado;
+        guardarPedidosEnLocalStorage(pedidos);
+        return true;
+    }
+    return false;
+}
+
+// Función para limpiar todos los pedidos del localStorage (útil para pruebas)
+function limpiarPedidosLocalStorage() {
+    try {
+        localStorage.removeItem('pasteleria_pedidos');
+        console.log('Pedidos eliminados del localStorage');
+        showNotification('Todos los pedidos han sido eliminados', 'success');
+        
+        // Recargar la lista si el panel está abierto
+        if (document.getElementById('adminPanel').classList.contains('active')) {
+            cargarPedidos();
+        }
+    } catch (error) {
+        console.error('Error al limpiar pedidos del localStorage:', error);
+        showNotification('Error al limpiar los pedidos', 'error');
+    }
+}
+
+// Función de prueba para verificar PDF
+function testPDF() {
+    try {
+        console.log('Iniciando prueba de PDF...');
+        
+        // Verificar que jsPDF esté disponible
+        if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+            console.error('jsPDF no está cargado');
+            showNotification('Error: jsPDF no está disponible', 'error');
+            return;
+        }
+        
+        // Intentar diferentes formas de acceder a jsPDF
+        let jsPDF;
+        if (typeof window.jspdf !== 'undefined') {
+            jsPDF = window.jspdf.jsPDF;
+        } else if (typeof window.jsPDF !== 'undefined') {
+            jsPDF = window.jsPDF;
+        } else {
+            throw new Error('jsPDF no está disponible');
+        }
+        
+        console.log('jsPDF disponible, creando documento de prueba...');
+        
+        // Crear un PDF simple de prueba
+        const doc = new jsPDF();
+        doc.setFont('helvetica');
+        doc.setFontSize(20);
+        doc.text('Prueba de PDF - B3stia\'s Cake', 20, 30);
+        doc.setFontSize(12);
+        doc.text('Este es un documento de prueba', 20, 50);
+        doc.text(`Fecha: ${new Date().toLocaleString('es-ES')}`, 20, 70);
+        
+        const fileName = `test_pdf_${new Date().toISOString().split('T')[0]}.pdf`;
+        console.log('Guardando PDF de prueba:', fileName);
+        doc.save(fileName);
+        
+        console.log('PDF de prueba guardado exitosamente');
+        showNotification('PDF de prueba generado correctamente', 'success');
+        
+    } catch (error) {
+        console.error('Error en prueba de PDF:', error);
+        showNotification('Error en prueba de PDF: ' + error.message, 'error');
+    }
+}
+
+// Función para obtener estadísticas de pedidos
+function obtenerEstadisticasPedidos() {
+    const pedidos = cargarPedidosDesdeLocalStorage();
+    
+    const estadisticas = {
+        total: pedidos.length,
+        pendientes: pedidos.filter(p => p.estado === 'Pendiente').length,
+        enProceso: pedidos.filter(p => p.estado === 'En proceso').length,
+        completados: pedidos.filter(p => p.estado === 'Completado').length,
+        entregados: pedidos.filter(p => p.estado === 'Entregado').length
+    };
+    
+    return estadisticas;
+}
+
+// Función para verificar el estado de las librerías PDF
+function verificarLibreriasPDF() {
+    console.log('=== Verificación de Librerías PDF ===');
+    console.log('window.jspdf:', typeof window.jspdf);
+    console.log('window.jsPDF:', typeof window.jsPDF);
+    
+    if (typeof window.jspdf !== 'undefined') {
+        console.log('window.jspdf.jsPDF:', typeof window.jspdf.jsPDF);
+    }
+    
+    if (typeof window.jsPDF !== 'undefined') {
+        console.log('window.jsPDF disponible');
+    }
+    
+    console.log('html2canvas:', typeof window.html2canvas);
+    console.log('===============================');
+    
+    let mensaje = 'Estado de librerías:\n';
+    mensaje += `jsPDF: ${typeof window.jspdf !== 'undefined' ? 'Cargado' : 'No cargado'}\n`;
+    mensaje += `html2canvas: ${typeof window.html2canvas !== 'undefined' ? 'Cargado' : 'No cargado'}`;
+    
+    showNotification(mensaje, 'info');
+}
