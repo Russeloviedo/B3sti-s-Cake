@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B3stia's Cake - Pastelería Artesanal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <img src="Public/logo.jpg" alt="B3stia's Cake Logo" class="logo-image">
+                    <div class="logo-text">
+                        <h1>B3stia's</h1>
+                        <span>Pasteleria Artesanal</span>
+                    </div>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#pasteles">Pasteles</a></li>
+                    <li><a href="#personalizados">Personalizados</a></li>
+                    <li><a href="#calculadora">Calculadora</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Dulces Momentos,<br>Artesanales Sabores</h1>
+                <p>Descubre la magia de nuestros pasteles artesanales, creados con amor y los mejores ingredientes para hacer de cada celebración un momento inolvidable.</p>
+                <div class="hero-buttons">
+                    <a href="#pasteles" class="btn btn-primary">Ver Pasteles</a>
+                    <a href="#personalizados" class="btn btn-secondary">Pedido Personalizado</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="cake-showcase">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Pastel elegante">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Nuestra Historia</h2>
+                    <p>En B3stia's Cake, cada pastel cuenta una historia. Nuestros dulces son más que postres; son obras de arte comestibles que llevan el sello de la pasión y la creatividad artesanal.</p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-heart"></i>
+                            <h3>Hecho con Amor</h3>
+                            <p>Cada ingrediente seleccionado con cuidado y cada decoración creada con dedicación.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-star"></i>
+                            <h3>Calidad Premium</h3>
+                            <p>Utilizamos solo los mejores ingredientes frescos y naturales.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-magic"></i>
+                            <h3>Diseños Únicos</h3>
+                            <p>Cada pastel es una creación única que refleja tu personalidad y estilo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pasteles Section -->
+    <section id="pasteles" class="pasteles">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestros Pasteles</h2>
+                <p>Descubre nuestra colección de pasteles artesanales</p>
+            </div>
+            <div class="pasteles-grid">
+                <div class="pastel-card">
+                    <div class="pastel-image">
+                        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Pastel de Chocolate">
+                    </div>
+                    <div class="pastel-info">
+                        <h3>Chocolate Elegante</h3>
+                        <p>Chocolate belga con relleno de ganache y decoración de flores comestibles</p>
+                        <span class="price">$45.00</span>
+                        <button class="btn btn-primary">Ordenar</button>
+                    </div>
+                </div>
+                <div class="pastel-card">
+                    <div class="pastel-image">
+                        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Pastel de Vainilla">
+                    </div>
+                    <div class="pastel-info">
+                        <h3>Vainilla Clásica</h3>
+                        <p>Vainilla de Madagascar con crema de mantequilla y frutas frescas</p>
+                        <span class="price">$38.00</span>
+                        <button class="btn btn-primary">Ordenar</button>
+                    </div>
+                </div>
+                <div class="pastel-card">
+                    <div class="pastel-image">
+                        <img src="https://images.unsplash.com/photo-1562440499-64c9a111f713?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Pastel de Frutas">
+                    </div>
+                    <div class="pastel-info">
+                        <h3>Frutas del Bosque</h3>
+                        <p>Mezcla de frutas rojas con crema chantilly y decoración natural</p>
+                        <span class="price">$42.00</span>
+                        <button class="btn btn-primary">Ordenar</button>
+                    </div>
+                </div>
+                <div class="pastel-card">
+                    <div class="pastel-image">
+                        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Pastel de Red Velvet">
+                    </div>
+                    <div class="pastel-info">
+                        <h3>Red Velvet</h3>
+                        <p>Terciopelo rojo con crema de queso y decoración vintage</p>
+                        <span class="price">$48.00</span>
+                        <button class="btn btn-primary">Ordenar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Personalizados Section -->
+    <section id="personalizados" class="personalizados">
+        <div class="container">
+            <div class="section-header">
+                <h2>Pedidos Personalizados</h2>
+                <p>Crea el pastel de tus sueños con nosotros</p>
+            </div>
+            <div class="personalizados-content">
+                <div class="form-container">
+                    <form class="custom-form">
+                        <div class="form-group">
+                            <label for="nombre">Nombre completo</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Correo electrónico</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sabor">Sabor del pastel</label>
+                            <select id="sabor" name="sabor" required>
+                                <option value="">Selecciona un sabor</option>
+                                <option value="chocolate">Chocolate</option>
+                                <option value="vainilla">Vainilla</option>
+                                <option value="frutas">Frutas del Bosque</option>
+                                <option value="red-velvet">Red Velvet</option>
+                                <option value="limon">Limón</option>
+                                <option value="cafe">Café</option>
+                                <option value="personalizado">Otro (especificar)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tamaño">Tamaño</label>
+                            <select id="tamaño" name="tamaño" required>
+                                <option value="">Selecciona el tamaño</option>
+                                <option value="pequeño">Pequeño (6-8 personas)</option>
+                                <option value="mediano">Mediano (10-12 personas)</option>
+                                <option value="grande">Grande (15-20 personas)</option>
+                                <option value="extra-grande">Extra Grande (25+ personas)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="decoracion">Tipo de decoración</label>
+                            <select id="decoracion" name="decoracion" required>
+                                <option value="">Selecciona la decoración</option>
+                                <option value="flores">Flores naturales</option>
+                                <option value="fondant">Fondant</option>
+                                <option value="crema">Crema de mantequilla</option>
+                                <option value="frutas">Frutas frescas</option>
+                                <option value="chocolate">Chocolate artístico</option>
+                                <option value="personalizada">Personalizada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha">Fecha de entrega</label>
+                            <input type="date" id="fecha" name="fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mensaje">Descripción especial</label>
+                            <textarea id="mensaje" name="mensaje" rows="4" placeholder="Cuéntanos sobre tu idea especial, colores preferidos, tema de la celebración..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="foto-referencia">Foto de referencia (opcional)</label>
+                            <div class="file-upload-container">
+                                <input type="file" id="foto-referencia" name="foto-referencia" accept="image/*" class="file-input">
+                                <label for="foto-referencia" class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Subir imagen de referencia</span>
+                                    <small>JPG, PNG, GIF hasta 5MB</small>
+                                </label>
+                                <div class="file-preview" id="file-preview" style="display: none;">
+                                    <img id="preview-image" src="" alt="Vista previa">
+                                    <button type="button" class="remove-file" id="remove-file">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Enviar Pedido</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculadora de Precios Section -->
+    <section id="calculadora" class="calculadora">
+        <div class="container">
+            <div class="section-header">
+                <h2>Calculadora de Precios</h2>
+                <p>Estima el costo de tu pastel personalizado</p>
+            </div>
+            <div class="calculadora-content">
+                <div class="calculadora-form">
+                    <div class="form-group">
+                        <label for="tamano">Tamaño del Pastel</label>
+                        <select id="tamano" name="tamano" required>
+                            <option value="">Selecciona el tamaño</option>
+                            <option value="pequeno" data-precio="25">Pequeño (6-8 personas) - $25</option>
+                            <option value="mediano" data-precio="45">Mediano (10-12 personas) - $45</option>
+                            <option value="grande" data-precio="65">Grande (15-20 personas) - $65</option>
+                            <option value="extra-grande" data-precio="85">Extra Grande (25+ personas) - $85</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sabor de la Masa</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="sabores" value="vainilla" data-precio="0">
+                                <span class="checkmark"></span>
+                                Vainilla (incluido)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="sabores" value="chocolate" data-precio="5">
+                                <span class="checkmark"></span>
+                                Chocolate (+$5)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="sabores" value="red-velvet" data-precio="8">
+                                <span class="checkmark"></span>
+                                Red Velvet (+$8)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="sabores" value="limon" data-precio="6">
+                                <span class="checkmark"></span>
+                                Limón (+$6)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rellenos</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="rellenos" value="crema-vainilla" data-precio="3">
+                                <span class="checkmark"></span>
+                                Crema de Vainilla (+$3)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="rellenos" value="chocolate" data-precio="4">
+                                <span class="checkmark"></span>
+                                Chocolate (+$4)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="rellenos" value="frutilla" data-precio="5">
+                                <span class="checkmark"></span>
+                                Frutilla (+$5)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="rellenos" value="dulce-leche" data-precio="4">
+                                <span class="checkmark"></span>
+                                Dulce de Leche (+$4)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Decoraciones Especiales</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="decoraciones" value="flores-fondant" data-precio="15">
+                                <span class="checkmark"></span>
+                                Flores de Fondant (+$15)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="decoraciones" value="figuras-3d" data-precio="20">
+                                <span class="checkmark"></span>
+                                Figuras 3D (+$20)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="decoraciones" value="pintura-comestible" data-precio="12">
+                                <span class="checkmark"></span>
+                                Pintura Comestible (+$12)
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="decoraciones" value="glitter-comestible" data-precio="8">
+                                <span class="checkmark"></span>
+                                Glitter Comestible (+$8)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad</label>
+                        <input type="number" id="cantidad" name="cantidad" min="1" max="10" value="1" required>
+                    </div>
+                </div>
+                
+                <div class="calculadora-resultado">
+                    <div class="precio-total">
+                        <h3>Precio Estimado</h3>
+                        <div class="precio-valor">
+                            <span class="moneda">$</span>
+                            <span id="precio-total">0</span>
+                        </div>
+                        <p class="precio-nota">* Precio base + ingredientes seleccionados</p>
+                    </div>
+                    
+                    <div class="desglose-precio">
+                        <h4>Desglose</h4>
+                        <div id="desglose-lista">
+                            <p class="no-seleccion">Selecciona opciones para ver el desglose</p>
+                        </div>
+                    </div>
+                    
+                    <div class="calculadora-acciones">
+                        <button id="limpiar-calculadora" class="btn btn-secondary">Limpiar</button>
+                        <a href="#personalizados" class="btn btn-primary">Hacer Pedido</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nosotros Section -->
+                    <div class="info-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Proceso de Creación</h3>
+                        <p>Nuestros pasteles personalizados requieren 3-5 días de anticipación para garantizar la calidad artesanal.</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-palette"></i>
+                        <h3>Diseños Únicos</h3>
+                        <p>Cada pastel es una obra de arte única. Trabajamos contigo para crear exactamente lo que imaginas.</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-leaf"></i>
+                        <h3>Ingredientes Frescos</h3>
+                        <p>Utilizamos solo ingredientes frescos y de la más alta calidad para garantizar el mejor sabor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nosotros Section -->
+    <section id="nosotros" class="nosotros">
+        <div class="container">
+            <div class="nosotros-content">
+                <div class="nosotros-text">
+                    <h2>Sobre B3stia's</h2>
+                    <p>Somos una pastelería artesanal que nació de la pasión por crear momentos dulces y memorables. Cada pastel que creamos lleva consigo años de experiencia, creatividad y, sobre todo, mucho amor.</p>
+                    <p>Nuestra misión es transformar tus celebraciones en experiencias inolvidables a través de sabores únicos y diseños que cuentan historias.</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="number">500+</span>
+                            <span class="label">Pasteles Creados</span>
+                        </div>
+                        <div class="stat">
+                            <span class="number">300+</span>
+                            <span class="label">Clientes Felices</span>
+                        </div>
+                        <div class="stat">
+                            <span class="number">5</span>
+                            <span class="label">Años de Experiencia</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="nosotros-image">
+                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Nuestro equipo">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto Section -->
+    <section id="contacto" class="contacto">
+        <div class="container">
+            <div class="section-header">
+                <h2>Contáctanos</h2>
+                <p>Estamos aquí para hacer realidad tus sueños dulces</p>
+            </div>
+            <div class="contacto-content">
+                <div class="contacto-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Dirección</h3>
+                            <p>Av. Principal 123<br>Ciudad, Estado 12345</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Teléfono</h3>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>info@brendab3stia.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Horarios</h3>
+                            <p>Lunes - Viernes: 9:00 AM - 6:00 PM<br>Sábados: 9:00 AM - 4:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contacto-form">
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <input type="text" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" placeholder="Teléfono">
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="Mensaje" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <h3>B3stia's</h3>
+                        <span>Cake</span>
+                    </div>
+                    <p>Creando momentos dulces y memorables desde 2019.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="#pasteles">Pasteles</a></li>
+                        <li><a href="#personalizados">Personalizados</a></li>
+                        <li><a href="#nosotros">Nosotros</a></li>
+                        <li><a href="#contacto">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Servicios</h4>
+                    <ul>
+                        <li>Pasteles de Boda</li>
+                        <li>Pasteles de Cumpleaños</li>
+                        <li>Pasteles Corporativos</li>
+                        <li>Pasteles Temáticos</li>
+                        <li>Entrega a Domicilio</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Suscríbete para recibir nuestras ofertas especiales y novedades.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Tu correo electrónico">
+                        <button type="submit" class="btn btn-primary">Suscribirse</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 B3stia's Cake. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

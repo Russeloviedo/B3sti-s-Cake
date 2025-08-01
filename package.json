@@ -1,0 +1,26 @@
+{
+  "name": "brenda-b3stia-cake",
+  "version": "1.0.0",
+  "description": "Sitio web moderno y elegante para la pastelería artesanal Brenda B3stia's Cake",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 3000 -o",
+    "start": "http-server -p 3000",
+    "serve": "python -m http.server 3000"
+  },
+  "keywords": [
+    "pasteleria",
+    "cake",
+    "website",
+    "responsive",
+    "modern"
+  ],
+  "author": "Brenda B3stia's Cake",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "three": "^0.158.0"
+  }
+} 
